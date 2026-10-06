@@ -7,7 +7,7 @@ How we understand a piece is in `constitution.md`. When a piece counts as done i
 
 | Order | Piece | Status | Commit |
 |---|---|---|---|
-| 1 | `generationOfValuesRandom` | todo | |
+| 1 | `generationOfValuesRandom` | done | |
 | 2 | `generationOfValuesAPI` | todo | |
 | 3 | `updateAndFormatVolume` | todo | |
 | 4 | `putTheMaxAndMinColour` | todo | |
