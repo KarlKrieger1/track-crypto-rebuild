@@ -1,31 +1,12 @@
 # Tasks
 
-One line per piece, in the order of `plan.md`.
-How we understand a piece is in `constitution.md`. When a piece counts as done is in `spec.md`.
+One row per block, added when the block is understood, in file order.
+How we understand a block is in `constitution.md`. The procedure is in `plan.md`. When a block counts as done is in `spec.md`.
+Line numbers refer to `legacy/pruebaBeforeProduction.gs` in this repo (frozen).
 
-**Status:** `todo` → `understood` → `rebuilt` → `tested` → `done` (tested and committed). A piece we drop gets `dropped`.
+**Status:** `understood` → `rebuilt` → `tested` → `done` (tested and committed). A block we drop gets `dropped`.
 
-| Order | Piece | Status | Commit |
-|---|---|---|---|
-| 1 | `generationOfValuesRandom` | done | |
-| 2 | `generationOfValuesAPI` | todo | |
-| 3 | `updateAndFormatVolume` | todo | |
-| 4 | `putTheMaxAndMinColour` | todo | |
-| 5 | `updateAndConfigureCellChanged` | todo | |
-| 6 | `updateID` | todo | |
-| 7 | `clearPercentCahanges` | todo | |
-| 8 | `updateConstantValues` | todo | |
-| 9a | `cryptoCarl` | todo | |
-| 9b | `proofOfIndex` | todo | |
-| 9c | `foolowingCalculatioAndRequest` | todo | |
-| 9d | `showGeneratedIndex` | todo | |
-| 9e | `showCellAdded` | todo | |
-| 10 | Block: settings and column map | todo | |
-| 11 | Block: state variables and colors | todo | |
-| 12 | Block: API settings | todo | |
-| 13 | Block: API request | todo | |
-| 14 | Block: key rotation and credit count | todo | |
-| 15 | Block: main loop | todo | |
-| 16 | Block: sort | todo | |
-| 17 | `runWholeSystem` (new) | todo | |
-| Final | Whole file: old vs new | todo | |
+| Lines | Block or function | What it does | Status | Commit |
+|---|---|---|---|---|
+| to fill | `generationOfValuesRandom` | Fills the 4 current-value variables with random numbers, to save credits | done | `68bf634` |
+| all | Whole file: old vs new | Final check | | |

@@ -11,7 +11,7 @@ A piece of code is understood only after four steps:
 | 1. Read | List what goes in, what comes out, and what it changes outside itself (sheet, variables) |
 | 2. Predict | Write what we expect to happen before running it |
 | 3. Run | Run the old code in a private copy of Apps Script, with small data |
-| 4. Record | Update the status of the piece in `tasks.md` |
+| 4. Record | Add the block to `tasks.md` with its lines and short comments. Answer any open question it resolves. |
 
 Code blocks outside functions (for example `requestOptions`) count the same as functions.
 
@@ -29,7 +29,9 @@ Code blocks outside functions (for example `requestOptions`) count the same as f
 4. No rebuilt code before the 4 SDD files are approved.
 5. If old code and Karl's idea disagree, the idea stays and the code is rebuilt to match it. If we are not sure which is right, run the old function and look at the result.
 6. Tests use the real API, with small requests to save credits.
-7. One commit per function, with a clear message. Each file is reviewed before it is committed.
+7. One commit per block, with a clear message. Each file is reviewed before it is committed.
+8. Work goes by blocks, in file order. Karl gives the line range. A function that a block calls is analyzed the first time it appears.
+9. The legacy file in this repo is frozen. Line numbers always refer to it.
 
 ## 4. Security
 
