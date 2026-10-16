@@ -1,12 +1,10 @@
 # Tasks
 
-One row per block, added when the block is understood, in file order.
-How we understand a block is in `constitution.md`. The procedure is in `plan.md`. When a block counts as done is in `spec.md`.
-Line numbers refer to `legacy/pruebaBeforeProduction.gs` in this repo (frozen).
+One row per finished block, in legacy line order. A row is added when the block is done or dropped. Legacy lines refer to `legacy/pruebaBeforeProduction.gs`.
 
-**Status:** `understood` → `rebuilt` → `tested` → `done` (tested and committed). A block we drop gets `dropped`.
+- **Status:** `done` (rebuilt, tested and committed) or `dropped` (understood, then judged not needed; the note says why).
+- **Reads:** what the block needs from earlier blocks (variables or sheet cells). **Produces:** what it leaves for later blocks. At the end, these two columns show how to connect the blocks.
+- **Commit:** the block's commit hash, written in the next block's commit (constitution rule 8).
 
-| Lines | Block or function | What it does | Status | Commit |
-|---|---|---|---|---|
-| to fill | `generationOfValuesRandom` | Fills the 4 current-value variables with random numbers, to save credits | done | `68bf634` |
-| all | Whole file: old vs new | Final check | | |
+| Legacy lines | Legacy name | Rebuilt name | Reads | Produces | Status | Commit | Note |
+|---|---|---|---|---|---|---|---|

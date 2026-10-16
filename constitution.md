@@ -1,56 +1,51 @@
 # Constitution
 
-Rules of the project. They change only if we edit them here first.
-Goal and "done" are in `spec.md`. Work order is in `plan.md`. Progress is in `tasks.md`.
-## 1. How we understand a function or code block
+Highest authority of this repo. If two files disagree, the order is: constitution, spec, plan, tasks, README.
+A rule changes only here, in its own commit.
 
-A piece of code is understood only after four steps:
+## 1. Terms
 
-| Step | What we do |
+- **SDD**: Spec-Driven Development. Here, the five Markdown files in the repo root.
+- **Legacy**: `legacy/pruebaBeforeProduction.gs` (540 lines), the original script.
+- **Block**: a function or a stretch of top-level code, identified by the legacy line range that Karl gives.
+- **Rebuilt**: the clean code in `rebuilt/`.
+
+## 2. One place per thing
+
+A fact or rule is written in one file only. Every other file links to it.
+
+| File | Holds |
 |---|---|
-| 1. Read | List what goes in, what comes out, and what it changes outside itself (sheet, variables) |
-| 2. Predict | Write what we expect to happen before running it |
-| 3. Run | Run the old code in a private copy of Apps Script, with small data |
-| 4. Record | Add the block to `tasks.md` with its lines and short comments. Answer any open question it resolves. |
+| `README.md` | Overview, folder tree, links |
+| `constitution.md` | Rules, labels, terms, this table |
+| `spec.md` | Requirements: scope, what must stay unchanged, acceptance criteria, and a glossary that grows block by block |
+| `plan.md` | The block cycle, decisions with their reasons, external facts, open questions |
+| `tasks.md` | One row per finished block, in legacy line order: legacy lines, legacy and rebuilt names, what it reads and produces, status, commit |
 
-Code blocks outside functions (for example `requestOptions`) count the same as functions.
+## 3. Evidence labels
 
-## 2. Labels
+Every statement about the code or the API carries one label. An unlabeled statement is not accepted.
 
-- **FACT**: tested by running it.
-- **INTERPRETATION**: read from the code, not run yet.
-- **HYPOTHESIS**: a guess.
+- **FACT**: what the code literally says (cite the lines), or what a test or a dated official source shows.
+- **INTERPRETATION**: what the code appears to do or mean, read but not run.
+- **HYPOTHESIS**: a possible reason or intent, not checked yet.
 
-## 3. Rules
+An external fact needs a link and the date it was checked. Paraphrase it. Never copy text from the source.
 
-1. The main idea of each function matters, not small details or unused code.
-2. Check the real current state before changing anything.
-3. No clean code is written until the idea is understood. Running the OLD code to learn is allowed (Rule 5).
-4. No rebuilt code before the 4 SDD files are approved.
-5. If old code and Karl's idea disagree, the idea stays and the code is rebuilt to match it. If we are not sure which is right, run the old function and look at the result.
-6. Tests use the real API, with small requests to save credits.
-7. One commit per block, with a clear message. Each file is reviewed before it is committed.
-8. Work goes by blocks, in file order. Karl gives the line range. A function that a block calls is analyzed the first time it appears.
-9. The legacy file in this repo is frozen. Line numbers always refer to it.
+## 4. Rules
 
-## 4. Security
-
-- API keys live only in Apps Script Script Properties. They never go into any file or commit, and never into the chat.
-- Before copying the legacy file into the repo, check that it has no key inside.
-
-## 5. Names
-
-- Professional English, camelCase (Apps Script / JavaScript standard).
-- Functions start with a verb: `downloadPrices`. Variables are nouns: `priceList`.
-- Booleans start with `is` or `has`. Constants use UPPER_SNAKE_CASE.
-- No abbreviations and no numbered names (`f1`, `tmp`, `x`).
-- If an old name is unclear, use the correct name and do not record the old one.
-- Code comments: simple English, explain the WHY.
-
-## 6. Code standards
-
-Rebuilt code follows Apps Script and JavaScript best practices, with security first.
-
-## 7. Repo quality
-
-The repo is public and is a portfolio. Commits and documents must be clean, ordered and clear. Each SDD file is one page at most.
+1. **Legacy is frozen.** The legacy file is never edited. Line numbers always refer to it.
+2. **No secrets.** API keys, tokens and passwords never go into files, commits, logs or chat. Rebuilt code never hardcodes a key; if keys are used, they come from Script Properties. A private legacy copy may hold keys and is never committed.
+3. **Karl leads, Claude verifies.** Karl gives the line range and explains it. Only then Claude checks it against the code. Claude does not analyze ahead of him. Nothing enters the SDD until Karl has understood and approved it.
+4. **Understand by running, then rebuild.** Rebuilding starts only after Karl approves the SDD. Each block is rebuilt only after Karl has explained it and the legacy block has been run in a private Apps Script copy. Use small data and small requests to save credits. If running needs setup, the setup belongs to the block.
+5. **Same behavior unless decided.** A rebuilt block reproduces the legacy behavior. A deliberate difference (bug fix, simplification, new API version) is a decision in `plan.md` with its reason and Karl's approval, never a silent change.
+6. **Questions must block something.** A question goes to `plan.md` only if it blocks a specific block. It names that block and the run that will answer it.
+7. **Rebuilt code standard.**
+   - Nothing runs on load: no code with side effects outside functions (the legacy fetches and writes on every execution).
+   - `const` and `let`, never `var`. Named constants instead of magic numbers.
+   - One job per function, one file per function in `rebuilt/`. A loose top-level block becomes a function.
+   - JSDoc on every function. Comments explain why, in simple English.
+   - Names: English camelCase; functions start with a verb; booleans start with `is` or `has`; constants are UPPER_SNAKE_CASE; no abbreviations or numbered names. Each name matches its definition in `spec.md`.
+   - Legacy names, typos included, appear only in `tasks.md`, next to the rebuilt name.
+8. **One commit per completed block.** The message names the block and its legacy lines. `tasks.md` is updated in that commit, except the commit's own hash, which is written in the next block's commit.
+9. **Clean public repo.** The repo is public. Commits stay clean and ordered, each SDD file stays about one page, and API responses are never committed.

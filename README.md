@@ -1,33 +1,22 @@
 # track-crypto-rebuild
 
-Rebuild of a legacy Google Apps Script file (last edited Dec 2021) that works with CoinMarketCap data in Google Sheets.
-First we understand the old code by running it. Then we rebuild it clean, one function or code block at a time, with the same behavior.
+A Google Apps Script that tracks cryptocurrency data from the CoinMarketCap API in a Google Sheet. The original, written in 2021, is rebuilt block by block into clean, secure, tested code. The original stays untouched.
 
-Progress is tracked in `tasks.md`.
-
-## Documents
-
-| File | What it holds |
-|---|---|
-| [constitution.md](constitution.md) | Rules and how we understand each piece |
-| [spec.md](spec.md) | Goal, scope and when something is done |
-| [plan.md](plan.md) | Map of the file, order of work, open questions |
-| [tasks.md](tasks.md) | One line per piece with its status |
-
-## Folder tree
+## Structure
 
 ```
-track-crypto-rebuild/
-├── README.md          # This page
-├── constitution.md    # Rules of the project
-├── spec.md            # Goal and definition of done
-├── plan.md            # Map of the file and order of work
-├── tasks.md           # Status for each piece
-├── legacy/
-│   └── pruebaBeforeProduction.gs   # Original copy, never edited
-└── rebuilt/           # Clean version, one file per function
+README.md
+constitution.md
+spec.md
+plan.md
+tasks.md
+legacy/    original script, never edited
+rebuilt/   rebuilt code, one file per function
+tests/     one test per block
 ```
 
-## Security
+What each Markdown file holds: `constitution.md` §2.
 
-No API keys are stored in this repository. Keys live only in Apps Script Script Properties.
+## Before and after
+
+Written when the rebuild is finished: a table of the main differences between the 2021 version and the rebuilt one, with a screenshot of both runs. The detail per block is in `tasks.md`.

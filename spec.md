@@ -1,41 +1,38 @@
 # Spec
 
-What we build and when it counts as done. How we work is in `constitution.md`.
+Requirements for the rebuild.
 
 ## 1. Goal
 
-Understand and rebuild `legacy/pruebaBeforeProduction.gs`, one function or code block at a time, and test the rebuilt file at the end.
+Rebuild `legacy/pruebaBeforeProduction.gs` as clean, secure, tested code that does the same job.
 
-## 2. Reference
-
-The legacy file was last edited in Dec 2021 and still runs. It is the version known to work, so it is the reference for behavior.
-
-## 3. Scope
+## 2. Scope
 
 | In | Out |
 |---|---|
-| The 13 functions of the file | Other files of the old repo |
-| The code blocks outside functions (settings, API request, loops) | New features |
-| A file that behaves like the original, with clean code | Changes in what the file calculates |
+| The 13 functions of the legacy file | Other files of the old repo |
+| The top-level code (lines 1–298): settings, API request, main loop, sort | Whatever fills `dataBaseFiltered` |
+| Clean, tested code in `rebuilt/` | New features |
 
-A file outside the scope enters only if a piece we rebuild calls it. It is then added to `plan.md` as an open question.
+Anything outside the scope enters only as a decision in `plan.md`.
 
-## 4. When is something DONE
+## 3. Requirements
+
+- **Stays unchanged:** the result in the sheet. For the same input, the rebuilt code writes the same values and formats as the legacy code.
+- **May change:** names, structure, efficiency, security and the way it is debugged.
+- Any other change is a decision in `plan.md`.
+
+## 4. Acceptance criteria
 
 | Level | Done when |
 |---|---|
-| Function or block | The four steps of understanding are finished. Karl explains it in his own words. The rebuilt version in `rebuilt/` passes its test with the real API and gives the same result as the old one. Its status in `tasks.md` is updated. One commit is made. |
-| Whole file | The full rebuilt run is compared with the original and the result is the same. |
-| Project | Every function and block is done. `README.md` links all files. No API key is anywhere in the repo. |
+| Block | Karl has explained it. The legacy block has been run. The rebuilt function passes its test. Its row is added to `tasks.md`. One commit is made |
+| Whole file | The rebuilt entry function reproduces a full legacy run: the same sheet result |
+| Project | Every block is done. The rows of `tasks.md` cover legacy lines 1–540 with no gaps. No API key is anywhere in the repo. `README.md` shows the before and after summary |
 
-**Same** means the same values and formats in the sheet.
+## 5. Glossary
 
-How to compare old and new results (the API data changes over time) is decided in `plan.md`.
+Terms the requirements use. One line per term, added only after Karl has understood the block that introduces it and approved the line.
 
-## 5. Connections
-
-| File | What it holds |
-|---|---|
-| `constitution.md` | Rules and how we understand each piece |
-| `plan.md` | Map of functions and blocks, order of work, open questions |
-| `tasks.md` | One line per piece with its status |
+| Term | Meaning | Rebuilt name |
+|---|---|---|

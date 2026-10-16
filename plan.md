@@ -1,30 +1,31 @@
 # Plan
 
-How we work through the legacy file. Rules are in `constitution.md`, goal and "done" in `spec.md`, progress in `tasks.md`.
+How we work through the legacy file, the decisions taken, and the external facts we rely on.
 
-## 1. Reference
+## 1. Block cycle
 
-The legacy file is `legacy/pruebaBeforeProduction.gs` in this GitHub repo. It is frozen. Every line number in the SDD files refers to this file.
+1. Karl gives the next legacy line range: normally the first line that no row of `tasks.md` covers, or a function that the block calls.
+2. Karl explains it in his own words.
+3. Claude checks the explanation against the code and reports what is confirmed, wrong or uncertain, with labels.
+4. The legacy block is run in a private Apps Script copy, with small data, and the output is compared with the explanation.
+5. Karl approves the glossary lines the block adds to `spec.md`.
+6. The block is rebuilt in `rebuilt/`, with its test in `tests/`.
+7. The test passes.
+8. A row is added to `tasks.md` and one commit is made.
 
-## 2. Procedure
+When every block is done, the entry function is written last, from the rows of `tasks.md`: their line order, Reads and Produces. Then the whole file is compared with a full legacy run and the summary is written in `README.md`.
 
-The old plan studied functions first. It broke when a function needed an input that lives in a block of loose code. So we work by blocks, in file order.
+## 2. Decisions
 
-For each block:
+- **Comparing results:** the legacy and the rebuilt code run on the same input. API data changes, so an API response is saved privately and fed to both versions in the private copy. It is never committed.
+- **Tests:** one test per block, in `tests/`, named after the rebuilt function.
+- **Debugging:** the block test and the Apps Script debugger. No logging framework. Legacy debug functions are rebuilt only if a block needs them.
 
-1. Karl gives the line range from the legacy file.
-2. Claude explains only those lines: what they do, what they need, what they produce.
-3. Karl explains the main idea back in his own words.
-4. We test it when it can be tested. Every statement gets a label (FACT, INTERPRETATION or HYPOTHESIS).
-5. A doubt that matters for understanding the code or for the refactor becomes an open question (section 3).
-6. When the block is understood, it is recorded in `tasks.md` with its lines and short comments. One commit per block.
+## 3. External facts
 
-A function that a block calls is analyzed the first time it appears.
+| Fact | Source | Date checked |
+|---|---|---|
 
-## 3. Open questions
+## 4. Open questions
 
-Written only when a real doubt appears in a block. Answered in the same row, when we reach the code that resolves it.
-
-| # | Question | Raised in (lines) | Answer | Label |
-|---|---|---|---|---|
-| | | | | |
+None yet. A question is added only when a block cannot be rebuilt without its answer.
