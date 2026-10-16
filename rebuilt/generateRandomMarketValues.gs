@@ -6,7 +6,7 @@ const MAX_VOLUME = 145;
  * Returns random market values so the code can be tested without
  * spending API credits. Never use it when working with real data.
  *
- * @return {{price: number, rank: number, volume: number, sellOrBuyRatio: number}}
+ * @return {{price: number, rank: number, volume: number, tradedCoinAmount: number}}
  */
 function generateRandomMarketValues() {
   // 1 - random() is never 0, so the ratio below never divides by zero.
@@ -14,5 +14,5 @@ function generateRandomMarketValues() {
   const rank = Math.round(Math.random() * MAX_RANK);
   const volume = Math.random() * MAX_VOLUME;
 
-  return { price, rank, volume, sellOrBuyRatio: volume / price };
+  return { price, rank, volume, tradedCoinAmount: volume / price };
 }
