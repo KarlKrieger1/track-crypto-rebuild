@@ -2,6 +2,8 @@
 
 A Google Apps Script that tracks cryptocurrency data from the CoinMarketCap API in a Google Sheet. The original, written in 2021, is rebuilt block by block into clean, secure, tested code. The original stays untouched.
 
+Start with `constitution.md`: it holds the rules and says where to look when something is unclear.
+
 ## Structure
 
 ```
@@ -11,11 +13,11 @@ spec.md
 plan.md
 tasks.md
 legacy/    original script, never edited
-rebuilt/   rebuilt code, one file per function
-tests/     one test per block
+rebuilt/   rebuilt code
+tests/     test scripts
 ```
 
-What each Markdown file holds: `constitution.md` §2.
+What each Markdown file holds: `constitution.md` section 2.
 
 ## Before and after
 
