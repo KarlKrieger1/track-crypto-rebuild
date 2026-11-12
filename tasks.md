@@ -6,5 +6,5 @@ One row per block, in legacy line order. Legacy lines refer to `legacy/pruebaBef
 - **Reads:** the dependencies of the rebuilt block: what it receives from other blocks (variables or sheet cells). Inputs declared only to run the block are not listed. **Produces:** what it leaves for later blocks. At the end, these two columns show how to connect the blocks.
 - **Commit:** the commit that holds the block's rebuilt code (constitution rule 8).
 
-| Legacy lines | Legacy names | Rebuilt functions and files | Reads | Produces | Status | Commit | Note |
-|---|---|---|---|---|---|---|---|
+| Legacy lines | Rebuilt functions | Reads | Produces | Status | Commit | Note |
+|---|---|---|---|---|---|---|
