@@ -21,11 +21,15 @@ Each block adds its call to the entry function, using its Reads and Produces. Wh
 - **Comparing results:** the legacy and the rebuilt code run on the same input. API data changes, so an API response is saved privately and fed to both versions in the private copy. It is never committed.
 - **Tests:** scripts in `tests/` show how the rebuilt code will work and the output of what is unclear to Karl. Each file's header explains its purpose and names the functions Karl must run from the Apps Script menu. Application logic lives only in `rebuilt/`.
 - **Debugging:** the block test and the Apps Script debugger. No logging framework. Legacy debug functions are rebuilt only if a block needs them.
+- **Monthly credits:** read with `/v1/key/info`; one call covers v1 and v3 with key.
 
 ## 3. External facts
 
 | Fact | Source | Date checked |
 |---|---|---|
+| Basic plan: 15,000 credits per month | https://coinmarketcap.com/api/pricing/ | 2026-11-13 |
+| Key info reports the plan's monthly limit and the credits used and left; it costs no credits | https://coinmarketcap.com/api/documentation/pro-api-reference/tools#key-info | 2026-11-14 |
+| Tested on a Basic key: key info reports 15,000 and counted 1 credit for one v1 call and 1 for one v3 call with key (1 ID each) | `tests/apiRequestBlockTests.gs`, `testKeyMeter` | 2026-11-14 |
 
 ## 4. Open questions
 
