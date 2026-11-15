@@ -25,11 +25,21 @@ Each block adds its call to the entry function, using its Reads and Produces. Wh
 
 ## 3. External facts
 
+A link as source means the fact was read in the official docs; a function name means a script in `tests/` measured it.
+
 | Fact | Source | Date checked |
 |---|---|---|
 | Basic plan: 15,000 credits per month | https://coinmarketcap.com/api/pricing/ | 2026-11-13 |
 | Key info reports the plan's monthly limit and the credits used and left; it costs no credits | https://coinmarketcap.com/api/documentation/pro-api-reference/tools#key-info | 2026-11-14 |
-| Tested on a Basic key: key info reports 15,000 and counted 1 credit for one v1 call and 1 for one v3 call with key (1 ID each) | `tests/apiRequestBlockTests.gs`, `testKeyMeter` | 2026-11-14 |
+| On a Basic key, key info reports 15,000 and counted 1 credit for one v1 call and 1 for one v3 call with key (1 ID each) | `testKeyMeter` | 2026-11-14 |
+| Per-minute limit: calls with one key in the same minute count; passing it returns HTTP 429 with error code 1008; it resets every minute | https://coinmarketcap.com/api/documentation/guides/errors-and-rate-limits | 2026-11-14 |
+| Quotes update frequency: v1 every 60 seconds; v3 every 15 to 25 seconds | https://coinmarketcap.com/api/documentation/pro-api-reference/deprecated and https://coinmarketcap.com/api/documentation/changelog (version 3.0.7) | 2026-11-15 |
+| Keyless v3 path is `/public-api/v3/cryptocurrency/quotes/latest`, sent without a key header; its limit is a shared pool per IP with no numbers published | https://coinmarketcap.com/api/documentation/pro-api-reference/keyless-public-api | 2026-11-15 |
+| On a Basic key, key info reports 50 requests per minute; 49 were accepted in each of 3 runs and the 50th got 429 with code 1008; the counter resets at the start of each UTC minute and calls work again then | `testMinuteLimit` | 2026-11-15 |
+| Toward the minute limit, a key info call counts 1 request, a v3 quotes call with key counts 1, and a v1 quotes call counts 2 (with 1 and with 5 coins) | `testKeyMeter`, `testQuotesFreshness` | 2026-11-15 |
+| Each coin's price changes about every 15 seconds on v1 and v3 with key, the same rhythm (Bitcoin: 3 changes in 40 seconds polled every second); no price change was seen without a new update time; new data shows 5 to 7 seconds after its stated time; the quote's own `last_updated` moves only about once a minute | `testQuotesFreshness` | 2026-11-15 |
+| An identical quotes call less than about 5 seconds after a charged call reported 0 credits (1 s and 3 s apart); calls 10 seconds apart cost 1 each; month used moved by exactly the credits reported | `testQuotesFreshness`, `testCreditSpacing` | 2026-11-15 |
+| Keyless v3 was refused with HTTP 429, code 1022 (anonymous access limit), after 8 and after 3 calls 5 seconds apart, and not in two other runs (12 and 6 calls) | `testQuotesFreshness` | 2026-11-15 |
 
 ## 4. Open questions
 
