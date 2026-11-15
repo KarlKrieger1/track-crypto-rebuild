@@ -23,30 +23,32 @@ const DEPRECATED_QUOTES_PATH = '/v1/cryptocurrency/quotes/latest';
 const CURRENT_QUOTES_PATH = '/v3/cryptocurrency/quotes/latest';
 const TEST_KEY_NUMBER = 4;
 const BITCOIN_ID = '1';
-const PAUSE_BEFORE_KEY_INFO_MS = 2000;
+const PAUSE_BEFORE_KEY_INFO_MILLISECONDS = 2000;
 const EXPECTED_MONTHLY_CREDITS = 15000;
 const KEYLESS_BASE_URL = 'https://pro-api.coinmarketcap.com/public-api';
 // Bitcoin, Ethereum, XRP, Dogecoin, Solana: volatile coins, so prices move often.
 const COIN_IDS = '1,1027,52,74,5426';
 const HTTP_STATUS_OK = 200;
+const MILLISECONDS_PER_SECOND = 1000;
+const AGE_DECIMAL_PLACES = 1;
 const MILLISECONDS_PER_MINUTE = 60000;
-const MINUTE_START_MARGIN_MS = 1000;
+const MINUTE_START_MARGIN_MILLISECONDS = 1000;
 const LIMIT_TEST_MAX_CALLS = 60;
-const RECOVERY_POLL_INTERVAL_MS = 5000;
+const RECOVERY_POLL_INTERVAL_MILLISECONDS = 5000;
 const RECOVERY_POLL_MAX_CALLS = 14;
 const FRESHNESS_CALLS_WITH_KEY = 40;
 // v1 counts two requests per call (measured), so it uses fewer and slower calls.
 const FRESHNESS_CALLS_DEPRECATED = 24;
-const FRESHNESS_INTERVAL_DEPRECATED_MS = 3000;
+const FRESHNESS_INTERVAL_DEPRECATED_MILLISECONDS = 3000;
 const SPACING_COIN_ID = '1';
 const SPACING_SHORT_CALLS = 12;
-const SPACING_SHORT_INTERVAL_MS = 3000;
+const SPACING_SHORT_INTERVAL_MILLISECONDS = 3000;
 const SPACING_LONG_CALLS = 6;
-const SPACING_LONG_INTERVAL_MS = 10000;
-const FRESHNESS_INTERVAL_WITH_KEY_MS = 1000;
+const SPACING_LONG_INTERVAL_MILLISECONDS = 10000;
+const FRESHNESS_INTERVAL_WITH_KEY_MILLISECONDS = 1000;
 const FRESHNESS_CALLS_KEYLESS = 6;
-const FRESHNESS_INTERVAL_KEYLESS_MS = 5000;
-const MINIMUM_GAP_BETWEEN_KEYED_SERIES_MS = 61000;
+const FRESHNESS_INTERVAL_KEYLESS_MILLISECONDS = 5000;
+const MINIMUM_GAP_BETWEEN_KEYED_SERIES_MILLISECONDS = 61000;
 
 /**
  * Run this to check that key info reports the monthly credits and counts
@@ -97,6 +99,7 @@ function testKeyMeter() {
     + (infoAfterCurrentCall.dayUsed - infoAfterDeprecatedCall.dayUsed)
     + ' | the call reported credit_count ' + reportedCreditsCurrentCall);
 }
+
 /**
  * Run this first. Sends key info calls (0 credits) one after another until
  * the API refuses one, then polls to see when calls are accepted again.
@@ -115,7 +118,7 @@ function testMinuteLimit() {
 
   // Wait for the start of the next UTC minute so all calls fall in one window.
   Utilities.sleep(MILLISECONDS_PER_MINUTE - (Date.now() % MILLISECONDS_PER_MINUTE)
-    + MINUTE_START_MARGIN_MS);
+    + MINUTE_START_MARGIN_MILLISECONDS);
   const firstCallTime = formatUtcTime(new Date());
   let callsAccepted = 0;
   let lastAcceptedCounter = null;
@@ -146,10 +149,10 @@ function testMinuteLimit() {
   let recoveredTime = null;
   let recoveryCallsMade = 0;
   if (refusedCallNumber !== null) {
-    Logger.log('Refused. Polling every ' + RECOVERY_POLL_INTERVAL_MS / 1000
+    Logger.log('Refused. Polling every ' + RECOVERY_POLL_INTERVAL_MILLISECONDS / MILLISECONDS_PER_SECOND
       + ' s to see when calls are accepted again.');
     for (let pollNumber = 1; pollNumber <= RECOVERY_POLL_MAX_CALLS; pollNumber++) {
-      Utilities.sleep(RECOVERY_POLL_INTERVAL_MS);
+      Utilities.sleep(RECOVERY_POLL_INTERVAL_MILLISECONDS);
       const pollTime = formatUtcTime(new Date());
       const pollResult = fetchApi(KEY_INFO_PATH, apiKey);
       recoveryCallsMade++;
@@ -206,8 +209,8 @@ function testQuotesFreshness() {
 
   const deprecatedSeries = runFreshnessSeries('v1 with key',
     () => fetchApi(DEPRECATED_QUOTES_PATH + quotesQuery, apiKey),
-    FRESHNESS_CALLS_DEPRECATED, FRESHNESS_INTERVAL_DEPRECATED_MS);
-  const deprecatedSeriesEndMs = Date.now();
+    FRESHNESS_CALLS_DEPRECATED, FRESHNESS_INTERVAL_DEPRECATED_MILLISECONDS);
+  const deprecatedSeriesEndMilliseconds = Date.now();
   const infoAfterDeprecated = readKeyInfo('AFTER v1 series', apiKey);
   if (!infoAfterDeprecated) {
     return;
@@ -215,14 +218,14 @@ function testQuotesFreshness() {
 
   const keylessSeries = runFreshnessSeries('v3 keyless',
     () => fetchKeylessApi(CURRENT_QUOTES_PATH + quotesQuery),
-    FRESHNESS_CALLS_KEYLESS, FRESHNESS_INTERVAL_KEYLESS_MS);
+    FRESHNESS_CALLS_KEYLESS, FRESHNESS_INTERVAL_KEYLESS_MILLISECONDS);
   // Wait until the v1 calls are more than 60 seconds old, whatever keyless did.
   Utilities.sleep(Math.max(0,
-    MINIMUM_GAP_BETWEEN_KEYED_SERIES_MS - (Date.now() - deprecatedSeriesEndMs)));
+    MINIMUM_GAP_BETWEEN_KEYED_SERIES_MILLISECONDS - (Date.now() - deprecatedSeriesEndMilliseconds)));
 
   const currentSeries = runFreshnessSeries('v3 with key',
     () => fetchApi(CURRENT_QUOTES_PATH + quotesQuery, apiKey),
-    FRESHNESS_CALLS_WITH_KEY, FRESHNESS_INTERVAL_WITH_KEY_MS);
+    FRESHNESS_CALLS_WITH_KEY, FRESHNESS_INTERVAL_WITH_KEY_MILLISECONDS);
   const infoAfterCurrent = readKeyInfo('AFTER v3 series', apiKey);
   if (!infoAfterCurrent) {
     return;
@@ -264,15 +267,15 @@ function testCreditSpacing() {
     return;
   }
   const shortSeries = runFreshnessSeries(
-    'v3 with key, ' + SPACING_SHORT_INTERVAL_MS / 1000 + ' s apart',
-    fetchSingleCoin, SPACING_SHORT_CALLS, SPACING_SHORT_INTERVAL_MS);
+    'v3 with key, ' + SPACING_SHORT_INTERVAL_MILLISECONDS / MILLISECONDS_PER_SECOND + ' s apart',
+    fetchSingleCoin, SPACING_SHORT_CALLS, SPACING_SHORT_INTERVAL_MILLISECONDS);
   const infoAfterShort = readKeyInfo('AFTER short spacing', apiKey);
   if (!infoAfterShort) {
     return;
   }
   const longSeries = runFreshnessSeries(
-    'v3 with key, ' + SPACING_LONG_INTERVAL_MS / 1000 + ' s apart',
-    fetchSingleCoin, SPACING_LONG_CALLS, SPACING_LONG_INTERVAL_MS);
+    'v3 with key, ' + SPACING_LONG_INTERVAL_MILLISECONDS / MILLISECONDS_PER_SECOND + ' s apart',
+    fetchSingleCoin, SPACING_LONG_CALLS, SPACING_LONG_INTERVAL_MILLISECONDS);
   const infoAfterLong = readKeyInfo('AFTER long spacing', apiKey);
   if (!infoAfterLong) {
     return;
@@ -287,34 +290,140 @@ function testCreditSpacing() {
     + longSeries.creditsReported + ' | month used changed by '
     + (infoAfterLong.monthUsed - infoAfterShort.monthUsed));
 }
+
+/**
+ * Calculates how old each coin's data was when a call started, for one of its
+ * two update times.
+ * @param {{coinId: string, price: *, quoteUpdated: *, coinUpdated: *}[]} records - One record per coin.
+ * @param {string} timeField - Which update time to use: 'quoteUpdated' or 'coinUpdated'.
+ * @param {number} callStartMilliseconds - When the call started, in milliseconds since 1970.
+ * @returns {?{youngest: number, oldest: number}} The smallest and the largest age
+ *     in seconds, or null when no coin has a valid time.
+ */
+function calculateAgeRange(records, timeField, callStartMilliseconds) {
+  const ages = records
+    .map((record) => (callStartMilliseconds - Date.parse(record[timeField])) / MILLISECONDS_PER_SECOND)
+    .filter(Number.isFinite);
+  if (ages.length === 0) {
+    return null;
+  }
+  return { youngest: Math.min(...ages), oldest: Math.max(...ages) };
+}
+
+/**
+ * Joins two age ranges into one that covers both.
+ * @param {?{youngest: number, oldest: number}} firstRange - A range, or null.
+ * @param {?{youngest: number, oldest: number}} secondRange - A range, or null.
+ * @returns {?{youngest: number, oldest: number}} The joined range, or null if both are null.
+ */
+function mergeAgeRanges(firstRange, secondRange) {
+  if (firstRange === null) {
+    return secondRange;
+  }
+  if (secondRange === null) {
+    return firstRange;
+  }
+  return {
+    youngest: Math.min(firstRange.youngest, secondRange.youngest),
+    oldest: Math.max(firstRange.oldest, secondRange.oldest)
+  };
+}
+
+/**
+ * Writes an age range as text for the log.
+ * @param {?{youngest: number, oldest: number}} ageRange - The range, or null.
+ * @returns {string} For example '4.6 to 19.7', or 'n/a' when there is no range.
+ */
+function describeAgeRange(ageRange) {
+  if (ageRange === null) {
+    return 'n/a';
+  }
+  return ageRange.youngest.toFixed(AGE_DECIMAL_PLACES)
+    + ' to ' + ageRange.oldest.toFixed(AGE_DECIMAL_PLACES);
+}
+
+/**
+ * Reads the credits that an answer reports for its own call.
+ * @param {?Object} body - The parsed answer.
+ * @returns {(number|string)} The credit count, or 'n/a' when the answer has none.
+ */
+function readReportedCredits(body) {
+  return body && body.status ? body.status.credit_count : 'n/a';
+}
+
+/**
+ * Compares each coin with its record from the earlier call.
+ * @param {{coinId: string, price: *, quoteUpdated: *, coinUpdated: *}[]} records - Records of this call.
+ * @param {Object<string, Object>} previousRecords - Records of the earlier call, by coin ID.
+ * @returns {{newDataCoinIds: string[], priceOnlyCoinIds: string[]}} The coins with a new
+ *     update time, and the coins whose price changed while neither update time did.
+ */
+function detectChanges(records, previousRecords) {
+  const newDataCoinIds = [];
+  const priceOnlyCoinIds = [];
+  records.forEach(function (record) {
+    const previous = previousRecords[record.coinId];
+    if (!previous) {
+      return;
+    }
+    const hasNewQuoteTime = record.quoteUpdated !== previous.quoteUpdated;
+    const hasNewCoinTime = record.coinUpdated !== previous.coinUpdated;
+    const hasNewPrice = String(record.price) !== String(previous.price);
+    if (hasNewQuoteTime || hasNewCoinTime) {
+      newDataCoinIds.push(record.coinId);
+    }
+    if (hasNewPrice && !hasNewQuoteTime && !hasNewCoinTime) {
+      priceOnlyCoinIds.push(record.coinId);
+    }
+  });
+  return { newDataCoinIds: newDataCoinIds, priceOnlyCoinIds: priceOnlyCoinIds };
+}
+
+/**
+ * Writes the log line of one successful call: credits, data ages and the
+ * Bitcoin price.
+ * @param {number} callNumber - Position of the call in its series.
+ * @param {string} callTime - UTC time when the call started.
+ * @param {(number|string)} reportedCredits - Credits the answer reported.
+ * @param {{coinId: string, price: *}[]} records - Records of this call.
+ * @param {?{youngest: number, oldest: number}} quoteAgeRange - Ages of the quote update times.
+ * @param {?{youngest: number, oldest: number}} coinAgeRange - Ages of the coin update times.
+ * @returns {void} Nothing; the line goes to the Execution log.
+ */
+function logSeriesCall(callNumber, callTime, reportedCredits, records, quoteAgeRange, coinAgeRange) {
+  const bitcoinRecord = records.find((record) => record.coinId === BITCOIN_ID);
+  Logger.log('call ' + callNumber + ' | UTC ' + callTime + ' | HTTP ' + HTTP_STATUS_OK
+    + ' | credit_count ' + reportedCredits + ' | coins ' + records.length
+    + ' | quote age ' + describeAgeRange(quoteAgeRange)
+    + ' s | coin age ' + describeAgeRange(coinAgeRange)
+    + ' s | bitcoin price ' + (bitcoinRecord ? bitcoinRecord.price : 'n/a'));
+}
+
 /**
  * Repeats one call at a fixed interval and logs, per call, the credits it
- * reported and the age of the data (time of the call minus the coin's own
- * update time, measured at the start of the call). It also reports, per coin,
- * when its own update time changed and when its price changed while its own
- * update time did not. It stops at the first non-200 answer, never retries.
+ * reported, the age of the data, and the coins whose update time or price
+ * changed. It stops at the first non-200 answer and never retries.
  * @param {string} label - Text that marks this series in the log.
  * @param {function(): {statusCode: number, body: ?Object}} fetchOneCall - Makes one call.
  * @param {number} callCount - Maximum number of calls.
- * @param {number} intervalMs - Time from the start of one call to the next.
+ * @param {number} intervalMilliseconds - Time from the start of one call to the next.
  * @returns {{callsMade: number, newDataCalls: number, priceOnlyChanges: number, creditsReported: number}}
  *     Calls made, calls where at least one coin had a new update time, number
  *     of coin price changes without a new update time, and the sum of the
  *     credits the calls reported.
  */
-function runFreshnessSeries(label, fetchOneCall, callCount, intervalMs) {
+function runFreshnessSeries(label, fetchOneCall, callCount, intervalMilliseconds) {
   Logger.log('---------- SERIES: ' + label + ' ----------');
   let callsMade = 0;
   let newDataCalls = 0;
   let priceOnlyChanges = 0;
   let creditsReported = 0;
-  let smallestAge = null;
-  let largestAge = null;
+  let seriesQuoteAgeRange = null;
   const previousRecords = {};
 
   for (let callNumber = 1; callNumber <= callCount; callNumber++) {
-    const callStartMs = Date.now();
-    const callTime = formatUtcTime(new Date(callStartMs));
+    const callStartMilliseconds = Date.now();
+    const callTime = formatUtcTime(new Date(callStartMilliseconds));
     const result = fetchOneCall();
     callsMade++;
 
@@ -325,8 +434,7 @@ function runFreshnessSeries(label, fetchOneCall, callCount, intervalMs) {
       break;
     }
 
-    const reportedCredits = result.body && result.body.status
-      ? result.body.status.credit_count : 'n/a';
+    const reportedCredits = readReportedCredits(result.body);
     if (typeof reportedCredits === 'number') {
       creditsReported += reportedCredits;
     }
@@ -334,69 +442,36 @@ function runFreshnessSeries(label, fetchOneCall, callCount, intervalMs) {
     // Sorted by coin ID, so a change in the order of the answer cannot look like a change.
     const records = collectCoinRecords(result.body)
       .sort((first, second) => Number(first.coinId) - Number(second.coinId));
-    const ages = records
-      .map((record) => (callStartMs - Date.parse(record.quoteUpdated)) / 1000)
-      .filter(Number.isFinite);
-    const youngestAge = ages.length > 0 ? Math.min(...ages) : null;
-    const oldestAge = ages.length > 0 ? Math.max(...ages) : null;
-    if (youngestAge !== null && (smallestAge === null || youngestAge < smallestAge)) {
-      smallestAge = youngestAge;
-    }
-    if (oldestAge !== null && (largestAge === null || oldestAge > largestAge)) {
-      largestAge = oldestAge;
-    }
+    const quoteAgeRange = calculateAgeRange(records, 'quoteUpdated', callStartMilliseconds);
+    const coinAgeRange = calculateAgeRange(records, 'coinUpdated', callStartMilliseconds);
+    seriesQuoteAgeRange = mergeAgeRanges(seriesQuoteAgeRange, quoteAgeRange);
+    logSeriesCall(callNumber, callTime, reportedCredits, records, quoteAgeRange, coinAgeRange);
 
-    const coinAges = records
-      .map((record) => (callStartMs - Date.parse(record.coinUpdated)) / 1000)
-      .filter(Number.isFinite);
-    const bitcoinRecord = records.find((record) => record.coinId === BITCOIN_ID);
-    Logger.log('call ' + callNumber + ' | UTC ' + callTime + ' | HTTP ' + result.statusCode
-      + ' | credit_count ' + reportedCredits + ' | coins ' + records.length
-      + ' | quote age ' + (youngestAge === null ? 'n/a' : youngestAge.toFixed(1))
-      + ' to ' + (oldestAge === null ? 'n/a' : oldestAge.toFixed(1))
-      + ' s | coin age ' + (coinAges.length > 0
-        ? Math.min(...coinAges).toFixed(1) + ' to ' + Math.max(...coinAges).toFixed(1) : 'n/a')
-      + ' s | bitcoin price ' + (bitcoinRecord ? bitcoinRecord.price : 'n/a'));
-
-    const newDataCoins = [];
-    const priceOnlyCoins = [];
-    records.forEach(function (record) {
-      const previous = previousRecords[record.coinId];
-      if (previous) {
-        const hasNewUpdateTime = record.quoteUpdated !== previous.quoteUpdated;
-        const hasNewCoinTime = record.coinUpdated !== previous.coinUpdated;
-        const hasNewPrice = String(record.price) !== String(previous.price);
-        if (hasNewUpdateTime || hasNewCoinTime) {
-          newDataCoins.push(record.coinId);
-        }
-        if (hasNewPrice && !hasNewUpdateTime && !hasNewCoinTime) {
-          priceOnlyCoins.push(record.coinId);
-        }
-      }
+    const changes = detectChanges(records, previousRecords);
+    if (changes.newDataCoinIds.length > 0) {
+      newDataCalls++;
+      Logger.log('  NEW DATA (an update time changed): coins ' + changes.newDataCoinIds.join(','));
+    }
+    if (changes.priceOnlyCoinIds.length > 0) {
+      priceOnlyChanges += changes.priceOnlyCoinIds.length;
+      Logger.log('  PRICE ONLY (price changed, no update time did): coins '
+        + changes.priceOnlyCoinIds.join(','));
+    }
+    records.forEach((record) => {
       previousRecords[record.coinId] = record;
     });
-    if (newDataCoins.length > 0) {
-      newDataCalls++;
-      Logger.log('  NEW DATA (own update time changed): coins ' + newDataCoins.join(','));
-    }
-    if (priceOnlyCoins.length > 0) {
-      priceOnlyChanges += priceOnlyCoins.length;
-      Logger.log('  PRICE ONLY (price changed, own update time did not): coins '
-        + priceOnlyCoins.join(','));
-    }
 
     // Wait only the rest of the interval, so the pace does not drift.
-    const waitMs = intervalMs - (Date.now() - callStartMs);
-    if (waitMs > 0 && callNumber < callCount) {
-      Utilities.sleep(waitMs);
+    const waitMilliseconds = intervalMilliseconds - (Date.now() - callStartMilliseconds);
+    if (waitMilliseconds > 0 && callNumber < callCount) {
+      Utilities.sleep(waitMilliseconds);
     }
   }
 
   Logger.log('Series ' + label + ': ' + callsMade + ' calls | calls with new data '
     + newDataCalls + ' | price-only changes ' + priceOnlyChanges
     + ' | credits reported ' + creditsReported
-    + ' | smallest data age ' + (smallestAge === null ? 'n/a' : smallestAge.toFixed(1))
-    + ' s | largest ' + (largestAge === null ? 'n/a' : largestAge.toFixed(1)) + ' s');
+    + ' | quote age over the series ' + describeAgeRange(seriesQuoteAgeRange) + ' s');
   return {
     callsMade: callsMade,
     newDataCalls: newDataCalls,
@@ -497,7 +572,7 @@ function fetchApi(path, apiKey) {
  * @returns {?Object} The numbers read (limit and usage), or null if the call failed.
  */
 function readKeyInfo(label, apiKey) {
-  Utilities.sleep(PAUSE_BEFORE_KEY_INFO_MS);
+  Utilities.sleep(PAUSE_BEFORE_KEY_INFO_MILLISECONDS);
   const result = fetchApi(KEY_INFO_PATH, apiKey);
   if (result.statusCode !== 200 || !result.body || !result.body.data) {
     Logger.log(label + ' -> key info FAILED, HTTP ' + result.statusCode);
@@ -550,6 +625,7 @@ function callQuotesEndpoint(label, quotesPath, apiKey) {
     + ' | credit_count reported ' + reportedCredits);
   return reportedCredits;
 }
+
 /**
  * Makes one keyless GET call. It sends no key header, as the docs require.
  * HTTP errors are muted so the test can log the answer instead of stopping.
